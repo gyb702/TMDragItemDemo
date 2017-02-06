@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="MYAppItemView">
+            <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="应用名" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WpJ-pw-t9C">
+                    <rect key="frame" x="0.0" y="77" width="100" height="18"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ExcelFile.png" translatesAutoresizingMaskIntoConstraints="NO" id="dng-zy-ock">
+                    <rect key="frame" x="20" y="12" width="60" height="60"/>
+                    <color key="backgroundColor" red="0.29803921570000003" green="0.79215686269999996" blue="0.0039215686269999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="dng-zy-ock" secondAttribute="height" multiplier="1:1" id="zC8-PP-xwR"/>
+                    </constraints>
+                </imageView>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="WpJ-pw-t9C" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="64E-JC-LYi"/>
+                <constraint firstItem="dng-zy-ock" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="12" id="MaI-Be-pdK"/>
+                <constraint firstItem="WpJ-pw-t9C" firstAttribute="top" secondItem="dng-zy-ock" secondAttribute="bottom" constant="5" id="Oap-U8-PMk"/>
+                <constraint firstAttribute="trailing" secondItem="WpJ-pw-t9C" secondAttribute="trailing" id="T10-kA-6my"/>
+                <constraint firstAttribute="bottom" secondItem="WpJ-pw-t9C" secondAttribute="bottom" constant="5" id="Tr1-X2-KQ0"/>
+                <constraint firstItem="dng-zy-ock" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" id="YDC-e2-2RK"/>
+                <constraint firstAttribute="trailing" secondItem="dng-zy-ock" secondAttribute="trailing" constant="20" id="aw0-Je-pn8"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="img" destination="dng-zy-ock" id="4wE-5Z-FLY"/>
+                <outlet property="name" destination="WpJ-pw-t9C" id="Mdp-9Q-arP"/>
+            </connections>
+            <point key="canvasLocation" x="233" y="121"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="ExcelFile.png" width="150" height="150"/>
+    </resources>
+</document>
