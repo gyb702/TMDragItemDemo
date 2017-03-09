@@ -37,6 +37,10 @@ static NSString *const identifier = @"MYApplicationCenterViewCell";
 static CGFloat Row = 4;
 static CGFloat Ratio = 1.7;
 static CGFloat MarginX = 7;
+typedef NS_ENUM(NSInteger,CollectionVTag) {
+    AddCollectionVTag = 1,
+    UnAddCollectionVTag = 2,
+};
 
 #pragma mark – dealoc
 
@@ -166,9 +170,11 @@ static CGFloat MarginX = 7;
     
     self.addCollectionView.delegate = self;
     self.addCollectionView.dataSource = self;
+    self.addCollectionView.tag = AddCollectionVTag;
     
     self.unAddCollectionView.delegate = self;
     self.unAddCollectionView.dataSource = self;
+    self.unAddCollectionView.tag = UnAddCollectionVTag;
     
     self.addCollectionView.backgroundColor = [UIColor clearColor];
     self.unAddCollectionView.backgroundColor = [UIColor clearColor];
@@ -180,9 +186,10 @@ static CGFloat MarginX = 7;
     [self.unAddCollectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:identifier];
     
     CGFloat marginX = MarginX;
+    //    NSInteger row = (__kScreenHeight == 568 || __kScreenHeight == 480) ? 3 : 4;
     NSInteger row = Row;
     CGFloat itemW = (__kScreenWidth - 34 - (row - 1) * marginX) / row;
-    CGFloat itemH = itemW;
+    CGFloat itemH = itemW;//itemW/Ratio;
     _itemW = itemW;
     _itemH = itemH;
     
@@ -190,13 +197,19 @@ static CGFloat MarginX = 7;
     self.unAddCollectionViewLayout.itemSize = CGSizeMake(itemW, itemH);
     self.addCollectionViewLayout.minimumInteritemSpacing = 0;
     self.unAddCollectionViewLayout.minimumInteritemSpacing = 0;
+    
+//    self.sortLabel.hidden = YES;
+//    self.unAddLabel.hidden = YES;
 }
 
 - (void)updateCollectionViewFrame{
     
-    if (self.addAppArr.count == 0 || self.unAddAppArr.count == 0)
-        return;
+    //隐藏标题
+//    self.sortLabel.hidden = !(_addAppArr.count > 0);
+//    self.unAddLabel.hidden = !(_unAddAppArr.count > 0);
     
+    //    if (self.addAppArr.count == 0 || self.unAddAppArr.count == 0) return;
+    //    NSInteger row = (__kScreenHeight == 568 || __kScreenHeight == 480) ? 3 : 4;
     NSInteger row = Row;
     
     NSInteger upAddNum = self.addAppArr.count % row == 0 ? 0 : 1;
@@ -235,12 +248,11 @@ static CGFloat MarginX = 7;
 // 点击编辑按钮，切换到编辑状态
 - (void)switchToEditState{
     
-//    self.unAddCollectionView.hidden = YES;
-//    self.unAddLabel.hidden = YES;
+    //    self.unAddCollectionView.hidden = YES;
+    //    self.unAddLabel.hidden = YES;
     
     self.sortLabel.hidden = NO;
     
-    self.addCollectionView.tag = 999;
     [self.addCollectionView reloadData];
     [self.addCollectionView addGestureRecognizer:self.longPressGr];
     [self.unAddCollectionView reloadData];
@@ -253,32 +265,55 @@ static CGFloat MarginX = 7;
     self.unAddLabel.hidden = NO;
     self.sortLabel.hidden = YES;
     
-    self.addCollectionView.tag = 0;
+    //    self.addCollectionView.tag = 0;
     [self.addCollectionView reloadData];
     [self.unAddCollectionView reloadData];
-
+    
     [self.addCollectionView removeGestureRecognizer:self.longPressGr];
 }
 
-#pragma mark - 长按手势
+////  退出按钮被点击
+//- (IBAction)exitButtonClicked {
+//
+//    [UIView animateWithDuration:0.25 animations:^{
+//        self.transform = CGAffineTransformMakeTranslation(0, - self.bounds.size.height);
+//
+//    } completion:^(BOOL finished) {
+//        [self removeFromSuperview];
+//    }];
+//
+////    !self.completionBlock ?: self.completionBlock(self.upCricles);
+//}
+
+#pragma mark - 长按手势相关
 
 - (UILongPressGestureRecognizer *)longPressGr{
     if (_longPressGr == nil) {
-        _longPressGr = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressToDo:)];
+        _longPressGr = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressHandle:)];
         _longPressGr.minimumPressDuration = 0.5;
         _longPressGr.delaysTouchesBegan = YES;
     }
     return _longPressGr;
 }
 
-// 长按手势
--(void)longPressToDo:(UILongPressGestureRecognizer *)gestureRecognizer{
+- (void)longPressHandle:(UILongPressGestureRecognizer *)gestureRecognizer{
+    
+    if (SYSTEM_VERSION_LESS_THAN(@"9.0")) {
+        [self longPressToDo2:gestureRecognizer];
+    } else {
+        [self longPressToDo:gestureRecognizer];
+    }
+    
+}
+
+// 长按手势动作，ios9以下
+-(void)longPressToDo2:(UILongPressGestureRecognizer *)gestureRecognizer{
     
     static NSIndexPath *startIndexPath = nil;
     
     switch (gestureRecognizer.state) {
             
-        case UIGestureRecognizerStateBegan:
+        case UIGestureRecognizerStateBegan: // 长按手势刚开始
         {
             CGPoint startP = [gestureRecognizer locationInView:self.addCollectionView];
             
@@ -294,19 +329,19 @@ static CGFloat MarginX = 7;
         }
             break;
             
-        case UIGestureRecognizerStateChanged:
+        case UIGestureRecognizerStateChanged: // 长按手势移动过程中
         {
+            if (startIndexPath == nil) return;
+            
             CGPoint changeP = [gestureRecognizer locationInView:self.addCollectionView];
-            
-            UICollectionViewCell *moveCell = [self.addCollectionView cellForItemAtIndexPath:startIndexPath];
-            
-            moveCell.center = changeP;
-            
             NSIndexPath *changeIndexPath = [self.addCollectionView indexPathForItemAtPoint:changeP];
             
-            if (changeIndexPath == nil || changeIndexPath.item == startIndexPath.item)
-                return;
+            if (changeIndexPath == nil || changeIndexPath.item == startIndexPath.item) return;
             
+            //1.设置位置
+            UICollectionViewCell *moveCell = [self.addCollectionView cellForItemAtIndexPath:startIndexPath];
+            moveCell.center = changeP;
+            //2.改变数据源（reload时重新排序）
             NSString *startModel = self.addAppArr[startIndexPath.item];
             [self.addAppArr removeObject:startModel];
             [self.addAppArr insertObject:startModel atIndex:changeIndexPath.item];
@@ -317,7 +352,7 @@ static CGFloat MarginX = 7;
         }
             break;
             
-        case UIGestureRecognizerStateEnded:
+        case UIGestureRecognizerStateEnded: // 长按手势结束
         {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [self.addCollectionView reloadData];
@@ -328,16 +363,89 @@ static CGFloat MarginX = 7;
         default:
             break;
     }
+    
+}
+
+
+
+// 长按手势动作,iOS9以上
+-(void)longPressToDo:(UILongPressGestureRecognizer *)gestureRecognizer{
+    
+    //获取此次点击的坐标，根据坐标获取cell对应的indexPath
+    CGPoint point = [gestureRecognizer locationInView:self.addCollectionView];
+    NSIndexPath *indexPath = [self.addCollectionView indexPathForItemAtPoint:point];
+    
+    switch (gestureRecognizer.state) {
+            
+        case UIGestureRecognizerStateBegan: // 长按手势刚开始
+        {
+            if (!indexPath) return;
+            UICollectionViewCell* startCell = [self.addCollectionView cellForItemAtIndexPath:indexPath];
+            startCell.transform = CGAffineTransformMakeScale(1.2, 1.2); //放大
+            [self.addCollectionView bringSubviewToFront:startCell];
+            //开始移动
+            [self.addCollectionView beginInteractiveMovementForItemAtIndexPath:indexPath];
+            
+        }
+            break;
+            
+        case UIGestureRecognizerStateChanged: // 长按手势移动过程中
+        {
+            if (!indexPath) return;
+            //移动过程中更新位置坐标
+            [self.addCollectionView updateInteractiveMovementTargetPosition:point];
+            
+        }
+            break;
+            
+        case UIGestureRecognizerStateEnded: // 长按手势结束
+        {
+            //停止移动调用此方法
+            [self.addCollectionView endInteractiveMovement];
+            
+        }
+            break;
+            
+        default:{
+            //取消移动
+            [self.addCollectionView cancelInteractiveMovement];
+            
+        }
+            break;
+    }
+}
+
+// 在开始移动时会调用此代理方法，
+- (BOOL)collectionView:(UICollectionView *)collectionView canMoveItemAtIndexPath:(NSIndexPath *)indexPath {
+    //根据indexpath判断单元格是否可以移动，如果都可以移动，直接就返回YES ,不能移动的返回NO
+    if (collectionView.tag == AddCollectionVTag && self.isEditMode) {
+        return YES;
+    }
+    return NO;
+}
+
+// 在移动结束的时候调用此代理方法
+- (void)collectionView:(UICollectionView *)collectionView moveItemAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath*)destinationIndexPath {
+    /**
+     *sourceIndexPath 原始数据 indexpath
+     * destinationIndexPath 移动到目标数据的 indexPath
+     */
+    
+    MYApplicationCenterModel *startModel = self.addAppArr[sourceIndexPath.row];
+    [self.addAppArr removeObject:startModel];
+    [self.addAppArr insertObject:startModel atIndex:destinationIndexPath.row];
 }
 
 #pragma mark - UICollectionView代理方法
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
-    
-    if (collectionView == self.addCollectionView) {
-        return self.addAppArr.count;
+    NSInteger num = 0;
+    if (collectionView.tag == AddCollectionVTag) {
+        num = self.addAppArr.count;
+    }else{
+        num = self.unAddAppArr.count;
     }
-    return self.unAddAppArr.count;
+    return num;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
@@ -345,13 +453,18 @@ static CGFloat MarginX = 7;
     UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:indexPath];
     
     MYApplicationCenterModel *model;
-    if (collectionView == self.addCollectionView) {
+    if (collectionView.tag == AddCollectionVTag) {
         model = self.addAppArr[indexPath.item];
     }else{
         model = self.unAddAppArr[indexPath.item];
     }
     
+    //    // 上面的应用，且是处于可编辑状态
+    //    BOOL edited = collectionView == self.addCollectionView && self.upCollectionViewIsEdited;
+    
     cell.backgroundView = [self circleCellWithCircleModel:model collectionView:collectionView UICollectionViewCell:cell edited:_isEditMode];
+    
+    //    cell.backgroundView = [self circleCellWithCircleModel:model collectionView:collectionView edited:_isEditMode];
     
     return cell;
 }

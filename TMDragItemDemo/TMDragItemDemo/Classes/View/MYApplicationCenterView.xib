@@ -44,10 +44,10 @@
                                     <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="拖拽可以排序" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ElB-nI-MLI">
-                                    <rect key="frame" x="80" y="20" width="80" height="20"/>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="按住拖拽可以排序" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ElB-nI-MLI">
+                                    <rect key="frame" x="80" y="20" width="120" height="20"/>
                                     <constraints>
-                                        <constraint firstAttribute="width" constant="80" id="6VA-72-qf3"/>
+                                        <constraint firstAttribute="width" constant="120" id="6VA-72-qf3"/>
                                         <constraint firstAttribute="height" constant="20" id="h2P-SE-ngA"/>
                                     </constraints>
                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
